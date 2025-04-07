@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"handler" // Import the handler package to access Shield, Icon, IconToShield, and getIcons
 )
 
 var (
@@ -14,7 +15,7 @@ var (
 	black = color.Gray{Y: 34}
 )
 
-func generateDataJson(shields []Shield) error {
+func generateDataJson(shields []handler.Shield) error {
 	data, err := os.OpenFile("docs/data.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
@@ -35,8 +36,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	icon := Icon{Title: title, Hex: hex}
-	shield, err := IconToShield(icon)
+	icon := handler.Icon{Title: title, Hex: hex}
+	shield, err := handler.IconToShield(icon)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,14 +48,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	icons, err := getIcons()
-	if (err != nil) {
+	icons, err := handler.getIcons()
+	if err != nil {
 		log.Panicln(err)
 	}
 
-	shields := make([]Shield, len(icons))
-	for i, icons := range icons {
-		shield, err := IconToShield(icons)
+	shields := make([]handler.Shield, len(icons))
+	for i, icon := range icons {
+		shield, err := handler.IconToShield(icon)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -90,8 +91,8 @@ func main() {
 			return
 		}
 
-		icon := Icon{Title: title, Hex: hex}
-		shield, err := IconToShield(icon)
+		icon := handler.Icon{Title: title, Hex: hex}
+		shield, err := handler.IconToShield(icon)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
